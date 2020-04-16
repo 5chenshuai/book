@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.es.mapper.bookManger.BorrowMapper">
+
+
+    <resultMap id="borrowResultMap" type="com.book.es.bean.Borrow" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="book_number" property="bookNumber" jdbcType="VARCHAR" />
+        <result column="book_name" property="bookName" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="apply_day" property="applyDay" jdbcType="TIMESTAMP" />
+        <result column="examine_day" property="examineDay" jdbcType="TIMESTAMP" />
+        <result column="return_day" property="returnDay" jdbcType="TIMESTAMP" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+    </resultMap>
+    <select id="queryBorrow" resultMap="borrowResultMap">
+        SELECT * from tbl_borrow WHERE 1=1
+         <if test="userId!=null and userId!=''">
+             and user_id=#{userId}
+         </if>
+        <if test="bookNumber!=null and bookNumber!=''">
+            and book_number=#{bookNumber}
+        </if>
+        <if test="bookName!=null and bookName!=''">
+            and book_name=#{bookName}
+        </if>
+        <if test="status!=null">
+            and status in
+            <foreach collection="status" item="statusItem" index="index" open="(" close=")" separator=",">
+            #{statusItem}
+            </foreach>
+        </if>
+        order by apply_day asc
+    </select>
+
+    <insert id="addBorrow" parameterType="com.book.es.bean.Borrow" useGeneratedKeys="true" keyProperty="id">
+        INSERT into tbl_borrow(book_number, book_name,user_id,apply_day,examine_day,return_day,status) values(#{bookNumber}, #{bookName},#{userId},#{applyDay},#{examineDay},#{returnDay},#{status})
+    </insert>
+
+    <update id="updateBorrowById">
+        update tbl_borrow set status=#{status}
+         <if test="examineDay!=null">
+             ,examine_day=#{examineDay}
+         </if>
+        <if test="returnDay!=null">
+            ,return_day=#{returnDay}
+        </if>
+         where id=#{id}
+    </update>
+
+    <update id="updateBorrowByBookNumber">
+        update tbl_borrow set status=#{afterStatus} where book_number=#{bookNumber} and status=#{beforeStatus}
+    </update>
+
+    <select id="queryBorrowForUpdate" resultType="com.book.es.bean.Borrow">
+        SELECT * from tbl_borrow WHERE id=#{id} for update
+    </select>
+
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.es.mapper.bookManger.ShiroMapper">
+
+    <select id="queryUser" resultType="com.book.es.bean.User">
+        SELECT *
+         from tbl_user
+         WHERE username = #{userName}
+    </select>
+
+    <resultMap type="com.book.es.bean.User" id="shiro">
+        <id  property="id" column="id"/>
+        <result property="userName" column="username" />
+        <result property="password" column="password" />
+        <collection property="roles" ofType="com.book.es.bean.Role">
+            <id property="id" column="rid"/>
+            <collection property="permissions" ofType="com.book.es.bean.Permissions">
+                <id property="id" column="pid"/>
+                <result property="permissionsName" column="permissionsName" />
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="queryRoleByUserName" resultType="com.book.es.bean.Role">
+        SELECT tbl_user_role.rid
+         from tbl_user,tbl_user_role
+         WHERE tbl_user.id=tbl_user_role.uid
+         and username = #{userName}
+    </select>
+    <select id="queryPermissionsByUserName" resultType="com.book.es.bean.Permissions">
+        SELECT tbl_permissions.id,tbl_permissions.permissions_name
+         from tbl_user,tbl_user_role,tbl_role_permissions,tbl_permissions
+         WHERE tbl_user.id=tbl_user_role.uid and tbl_user_role.rid=tbl_role_permissions.rid
+         and tbl_role_permissions.pid=tbl_permissions.id and username = #{userName}
+    </select>
+
+
+</mapper>

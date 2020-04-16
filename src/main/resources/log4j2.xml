@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="off" monitorInterval="30">
+
+    <properties>
+        <property name="FILE_NAME">web</property>
+    </properties>
+    <CustomLevels>
+        <CustomLevel name="myLevel" intLevel="99" />
+    </CustomLevels>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout charset="UTF-8" pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+
+
+        <RollingRandomAccessFile name="book-service" fileName="logs/book/common.log" filePattern="logs/book/common.log.%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%c:%line] - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="100 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="50" />
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="book-login" fileName="logs/book/login.log" filePattern="logs/book/login.log.%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%c:%line] - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="100 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="50" />
+        </RollingRandomAccessFile>
+
+        <RollingRandomAccessFile name="ERROR_LOG" fileName="logs/book/error.log" filePattern="logs/book/error.log.%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8" pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%c:%line] - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="100 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="50" />
+            <filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" />
+            </filters>
+        </RollingRandomAccessFile>
+
+
+    </Appenders>
+
+    <Loggers>
+
+
+        <AsyncLogger name="com.book.es.impl" level="DEBUG">
+            <AppenderRef ref="book-service" />
+        </AsyncLogger>
+
+        <AsyncLogger name="login" level="DEBUG">
+            <AppenderRef ref="book-login" />
+        </AsyncLogger>
+
+
+        <AsyncRoot level="info" includeLocation="true">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="ERROR_LOG" />
+        </AsyncRoot>
+
+    </Loggers>
+</Configuration>

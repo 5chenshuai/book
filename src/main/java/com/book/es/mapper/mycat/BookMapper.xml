@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.es.mapper.mycat.BookMapper">
+
+    <select id="selectBookByNumber" resultType="com.book.es.bean.Book">
+        SELECT * from tbl_book WHERE book_number=#{bookNumber}
+    </select>
+
+   <!-- <insert id="insertBook" parameterType="com.book.es.bean.Book"  useGeneratedKeys="true" keyProperty="id">
+        INSERT into tbl_book(id,book_name, author,floor,bookshelf,book_number,press,status) value(next value for MYCATSEQ_BOOK,#{book_name}, #{author},#{floor},#{bookshelf},#{book_number},#{press},#{status})
+    </insert>-->
+    <insert id="insertBook" parameterType="com.book.es.bean.Book" useGeneratedKeys="true" keyProperty="id">
+        INSERT into tbl_book(`id`, `book_name`, `author`, `floor`, `bookshelf`, `book_number`, `press`, `status`, `edition`, `describe`, `picture`,`created_time`)
+         values(next value for MYCATSEQ_BOOK,#{bookName}, #{author},#{floor},#{bookshelf},#{bookNumber},#{press},#{status}, #{edition}, #{describe}, #{picture},#{createdTime})
+    </insert>
+
+    <update id="updateById">
+        update tbl_book set `book_name`=#{bookName}, `author`=#{author},`floor`=#{floor},`bookshelf`=#{bookshelf},
+        `book_number`=#{bookNumber},`press`=#{press},`status`=#{status}, `edition`=#{edition}, `describe`=#{describe}, `picture`=#{picture} where id=#{id}
+    </update>
+
+    <select id="findByNumberForUpdate" resultType="com.book.es.bean.Book">
+        SELECT * from tbl_book WHERE book_number=#{bookNumber} for update
+    </select>
+
+</mapper>

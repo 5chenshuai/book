@@ -1,0 +1,20 @@
+spring:
+  data:
+    elasticsearch:
+      cluster-name: docker-cluster
+      cluster-nodes: 106.14.32.36:9300
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+
+logging:
+  config: classpath:log4j2.xml
+
+aliyun-oss:
+  #bucket名称
+  bucketApp: book-img-cx
+  domainApp: https://book-img-cx.oss-cn-beijing.aliyuncs.com/
+  region: oss-cn-beijing
+  endpoint : https://oss-cn-beijing.aliyuncs.com
+  accessKeyId: LTAI4FgAGCV4Mhx8wQsottuB
+  accessKeySecret: FsDc7amlVJNsqbpzxBjgj3tAyrNWkx
