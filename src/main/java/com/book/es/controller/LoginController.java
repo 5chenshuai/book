@@ -1,8 +1,10 @@
 package com.book.es.controller;
 
 import com.book.es.annotation.ValidatorAnnotation;
+import com.book.es.bean.Role;
 import com.book.es.bean.User;
 import com.book.es.logging.Logging;
+import com.book.es.service.LoginService;
 import com.book.es.web.BaseController;
 import com.book.es.web.WebResponse;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +15,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +23,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @RestController
 public class LoginController extends Logging implements BaseController {
 
     private Logger loginLogger = LogManager
             .getLogger("login");
+
+    @Autowired
+    private LoginService loginService;
 
 //    @ValidatorAnnotation
     @RequestMapping("/login")
@@ -67,5 +74,26 @@ public class LoginController extends Logging implements BaseController {
     @PostMapping("/index2")
     public String index2() {
         return "index!";
+    }
+
+    @PostMapping("/update/password")
+    public WebResponse updatePassword(String password){
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        loginService.updatePasswordById(password,user.getId());
+        return ok();
+    }
+
+    @PostMapping("/add")
+    public WebResponse addUser(User user){
+        loginService.addUser(user);
+        loginService.addUserRole(user.getId(),3);
+        return ok();
+    }
+
+
+    @PostMapping("/updaterole")
+    public WebResponse updateUserRole(Integer uid, Integer rid){
+        loginService.updateUserRoleById(uid,rid);
+        return ok();
     }
 }

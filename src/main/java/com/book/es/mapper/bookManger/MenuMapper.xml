@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.es.mapper.bookManger.MenuMapper">
+
+    <insert id="addMenu">
+        insert into tbl_menu(menu_name,pid) values (#{menu_name},#{pid})
+    </insert>
+
+
+    <select id="selectMenu">
+        select * from tbl_menu where
+        pid in
+        <foreach collection="pid" index="index" item="pidItem" open="(" close=")" separator=",">
+            #{pidItem}
+        </foreach>
+    </select>
+    
+    <!--<delete id="">-->
+
+    <!--</delete>-->
+
+
+
+</mapper>

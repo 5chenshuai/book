@@ -15,4 +15,12 @@ public interface ShiroMapper {
 
     Set<Permissions> queryPermissionsByUserName(String userName);
 
+    Integer updatePassword(String password,Integer id);
+
+    Integer addUser(User user);
+
+    Integer addUserRoleById(Integer uid,Integer rid);
+
+    Integer updateUserRole(Integer uid,Integer rid);
+
 }
