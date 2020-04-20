@@ -3,6 +3,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.book.es.mapper.bookManger.ShiroMapper">
 
+    <update id="updateUserRole" parameterType="com.book.es.bean.Permissions">
+        update tbl_user_role set rid =#{rid} where uid=#{uid}
+    </update>
+
+    <insert id="addUserRoleById" >
+        insert into tbl_user_role(uid,rid) values (#{uid},#{rid})
+    </insert>
+
+    <insert id="addUser" parameterType="com.book.es.bean.User"  useGeneratedKeys="true" keyProperty="id">
+        INSERT into tbl_user(`username`,`password`,`name`,`email`) VALUES(#{userName},#{userName},#{name},#{email});
+    </insert>
+
+    <update id="updatePassword" parameterType="com.book.es.bean.User">
+        update tbl_user set password = #{password} where id = #{id}
+    </update>
+
     <select id="queryUser" resultType="com.book.es.bean.User">
         SELECT *
          from tbl_user
@@ -34,6 +50,8 @@
          WHERE tbl_user.id=tbl_user_role.uid and tbl_user_role.rid=tbl_role_permissions.rid
          and tbl_role_permissions.pid=tbl_permissions.id and username = #{userName}
     </select>
+
+
 
 
 </mapper>

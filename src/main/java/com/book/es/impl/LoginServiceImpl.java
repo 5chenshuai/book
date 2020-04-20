@@ -25,6 +25,32 @@ public class LoginServiceImpl implements LoginService {
         return getMapByName(getMapByName);
     }
 
+    @Override
+    public Boolean updatePasswordById(String password, Integer id) {
+
+        shiroMapper.updatePassword(password, id);
+
+        return true;
+    }
+
+    @Override
+    public boolean addUser(User user) {
+        return shiroMapper.addUser(user)==1;
+    }
+
+    @Override
+    public boolean addUserRole(Integer uid, Integer rid) {
+        shiroMapper.addUserRoleById(uid,rid);
+        return true;
+    }
+
+    @Override
+    public boolean updateUserRoleById(Integer uid,Integer rid) {
+        shiroMapper.updateUserRole(uid,rid);
+        return true;
+    }
+
+
     /**
      * 模拟数据库查询
      * @param userName

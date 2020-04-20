@@ -1,5 +1,6 @@
 package com.book.es.bean;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Set;
@@ -19,14 +20,20 @@ public class User {
      */
     private Set<Role> roles;
 
+    private String name;
+    @Email
+    private String email;
+
     public User() {
     }
 
-    public User(Integer id, String userName, String password, Set<Role> roles) {
+    public User(Integer id, @NotEmpty(message = "用户名不能为空") String userName, @NotEmpty(message = "密码不能为空") @Size(min = 5, max = 10, message = "密码长度介于5-10之间") String password, Set<Role> roles, String name, String email) {
         this.id = id;
         this.userName = userName;
         this.password = password;
         this.roles = roles;
+        this.name = name;
+        this.email = email;
     }
 
     public Integer getId() {
@@ -61,13 +68,19 @@ public class User {
         this.roles = roles;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
-                ", roles=" + roles +
-                '}';
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

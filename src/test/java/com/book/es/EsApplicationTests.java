@@ -1,15 +1,20 @@
 package com.book.es;
 
 import com.book.es.bean.Book;
+import com.book.es.bean.BorrowUser;
 import com.book.es.mapper.bookManger.BorrowMapper;
 import com.book.es.mapper.bookManger.ShiroMapper;
 import com.book.es.mapper.mycat.BookMapper;
 import com.book.es.service.BookService;
+import com.book.es.service.BorrowService;
+import com.book.es.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootTest
 class EsApplicationTests {
@@ -31,10 +36,20 @@ class EsApplicationTests {
         System.out.println(shiroMapper.queryUser("admin"));
     }
 
+    @Autowired
+    private BorrowService borrowService;
+
+    @Autowired
+    private EmailService emailService;
+
     @Test
     void contextLoads1() {
-        System.out.println(new Date());
 
+        List<BorrowUser> borrows = borrowService.queryShouldReturnBorrow();
+
+        for (BorrowUser borrowUser:borrows) {
+            emailService.sendEmail(borrowUser.getName(),borrowUser.getEmail(),borrowUser.getBookName(),borrowUser.getShouldReturnDay());
+        }
 //        Book book = new Book();
 //        book.setId(20018);
 //        book.setStatus(0);

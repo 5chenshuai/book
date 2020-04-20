@@ -2,6 +2,7 @@ package com.book.es.mapper.bookManger;
 
 import com.book.es.bean.Book;
 import com.book.es.bean.Borrow;
+import com.book.es.bean.BorrowUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
@@ -24,5 +25,7 @@ public interface BorrowMapper {
     int updateBorrowByBookNumber(String bookNumber,Integer beforeStatus,Integer afterStatus);
 
     Borrow queryBorrowForUpdate(Integer id);
+
+    List<BorrowUser> queryShouldReturn(Integer status);
 
 }

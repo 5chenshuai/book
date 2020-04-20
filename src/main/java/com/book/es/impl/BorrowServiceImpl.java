@@ -2,6 +2,7 @@ package com.book.es.impl;
 
 import com.book.es.bean.Book;
 import com.book.es.bean.Borrow;
+import com.book.es.bean.BorrowUser;
 import com.book.es.bean.User;
 import com.book.es.enums.BookStatusEnum;
 import com.book.es.enums.BorrowStatusEnum;
@@ -129,5 +130,10 @@ public class BorrowServiceImpl implements BorrowService {
         } else {
             throw new RuntimeException("该图书处于当前状态");
         }
+    }
+
+    @Override
+    public List<BorrowUser> queryShouldReturnBorrow() {
+        return borrowMapper.queryShouldReturn(1);
     }
 }
