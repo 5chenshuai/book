@@ -12,7 +12,9 @@ public enum BorrowStatusEnum {
 
     BORROWING_CANCEL(4,"撤销申请"),
 
-    BORROWING_WAIT(-1,"等待");
+    BORROWING_WAIT(-1,"等待"),
+
+    BORROWING_OVERDUE(-2,"逾期");
 
     private final int code;
 

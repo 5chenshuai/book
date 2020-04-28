@@ -58,6 +58,11 @@
     </select>
 
     <select id="queryShouldReturn" resultType="com.book.es.bean.BorrowUser">
-        SELECT `name`,`email`,`book_name`,DATE_FORMAT(DATE_ADD(examine_day,INTERVAL 14 DAY),'%Y-%m-%d') `shouldReturnDay` from tbl_borrow,tbl_user where tbl_user.id=tbl_borrow.user_id and status=#{status} and NOW()>=DATE_FORMAT(DATE_ADD(examine_day,INTERVAL 14 DAY),'%Y-%m-%d');;
+        SELECT `name`,`email`,`book_name`,DATE_FORMAT(DATE_ADD(examine_day,INTERVAL 14 DAY),'%Y-%m-%d') `shouldReturnDay` from tbl_borrow,tbl_user where tbl_user.id=tbl_borrow.user_id and status=#{status} and NOW()>=DATE_FORMAT(DATE_ADD(examine_day,INTERVAL 14 DAY),'%Y-%m-%d')
     </select>
+
+    <update id="updateBorrowOverdue">
+        update tbl_borrow set status=#{status} where NOW()>DATE_FORMAT(DATE_ADD(examine_day,INTERVAL 14 DAY),'%Y-%m-%d')
+    </update>
+
 </mapper>

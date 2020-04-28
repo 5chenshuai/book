@@ -8,17 +8,24 @@
     </insert>
 
 
-    <select id="selectMenu">
-        select * from tbl_menu where
+    <resultMap id="resultMap" type="com.book.es.bean.Menu">
+        <id property="id" column="id" />
+        <result property="menuName" column="menu_name"/>
+        <result property="url" column="url"/>
+    </resultMap>
+
+    <select id="selectMenu" resultMap="resultMap">
+        select id,menu_name,url from tbl_menu where
         pid in
         <foreach collection="pid" index="index" item="pidItem" open="(" close=")" separator=",">
             #{pidItem}
         </foreach>
+        group by menu_name
     </select>
-    
-    <!--<delete id="">-->
 
-    <!--</delete>-->
+    <select id="selectPidByRole" resultType="java.lang.Integer">
+        select pid from tbl_role_permissions where rid=#{roleId}
+    </select>
 
 
 

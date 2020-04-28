@@ -20,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import javax.validation.Valid;
@@ -49,7 +46,7 @@ public class BorrowController implements BaseController {
     @RequiresPermissions("borrow/add")
     @PostMapping("/add")
     @ValidatorAnnotation
-    WebResponse addBorrow(@Valid Borrow borrow, BindingResult bindingResult) {
+    WebResponse addBorrow(@RequestBody @Valid Borrow borrow, BindingResult bindingResult) {
         Iterable<Book> books = bookService.findByNumber(borrow.getBookNumber(),null);
         //前端控制
         if (!books.iterator().hasNext()) {
@@ -60,6 +57,12 @@ public class BorrowController implements BaseController {
             return defaultErr().setMsg("输入书名与编号不符");
         }
         User user = (User) SecurityUtils.getSubject().getPrincipal();
+        ArrayList<Integer> status = new ArrayList<>();
+        status.add(BorrowStatusEnum.BORROWING_OVERDUE.getCode());
+        List<Borrow> borrows = borrowMapper.queryBorrow(user.getId(), null, null, status);
+        if(borrows!=null && borrows.size()>0) {
+            return defaultErr().setMsg("你存在逾期未归还的书籍，不能申请借书");
+        }
         borrow.setUserId(user.getId());
         borrow.setStatus(BorrowStatusEnum.BORROWING_CREATED.getCode());
         borrow.setApplyDay(new Date());
@@ -124,9 +127,9 @@ public class BorrowController implements BaseController {
 
     @RequiresPermissions("borrow/update")
     @PostMapping("/update")
-    WebResponse updateBorrowById(Integer id,Integer status) {
+    WebResponse updateBorrowById(@RequestBody Borrow borrow) {
         try {
-            if(borrowService.updateBorrowById(id,status)) {
+            if(borrowService.updateBorrowById(borrow.getId(),borrow.getStatus())) {
                 return ok();
             } else {
                 return defaultErr();
@@ -138,9 +141,9 @@ public class BorrowController implements BaseController {
     }
     @RequiresPermissions("borrow/cancel")
     @PostMapping("/cancel")
-    WebResponse cancelBorrow(Integer id) {
+    WebResponse cancelBorrow(@RequestBody Borrow borrow) {
         try {
-            if(borrowService.updateBorrowById(id,BorrowStatusEnum.BORROWING_CANCEL.getCode())) {
+            if(borrowService.updateBorrowById(borrow.getId(),BorrowStatusEnum.BORROWING_CANCEL.getCode())) {
                 return ok();
             } else {
                 return defaultErr();

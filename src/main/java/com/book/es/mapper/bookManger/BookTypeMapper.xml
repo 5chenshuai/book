@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.es.mapper.bookManger.BookTypeMapper">
+
+    <insert id="addBookType">
+        insert into tbl_book_type(book_type) values (#{bookType})
+    </insert>
+
+
+
+    <select id="selectBookType" resultType="java.lang.String">
+        select book_type from tbl_book_type
+    </select>
+
+
+
+</mapper>

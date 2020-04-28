@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book.es.mapper.bookManger.CreditMapper">
+
+    <insert id="addCredit" parameterType="com.book.es.bean.Credit">
+        INSERT into tbl_borrow(book_number, book_name,user_id,examine_day) values(#{bookNumber}, #{bookName},#{userId},#{examineDay})
+    </insert>
+
+    <select id="queryCredit" resultType="com.book.es.bean.Credit">
+        SELECT * from tbl_credit WHERE 1=1
+        <if test="userId!=null and userId!=''">
+            and user_id=#{userId}
+        </if>
+        <if test="bookNumber!=null and bookNumber!=''">
+            and book_number=#{bookNumber}
+        </if>
+        <if test="bookName!=null and bookName!=''">
+            and book_name=#{bookName}
+        </if>
+    </select>
+
+
+</mapper>

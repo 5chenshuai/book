@@ -7,7 +7,8 @@ public enum FileTypeEnum {
     AUDIO(2, "音频"),
     VIDEO(3, "视频"),
     APP(4, "App包"),
-    OTHER(5, "其他");
+    OTHER(5, "其他"),
+    PDF(6, "pdf");
 
     private Integer code;
     private String message;

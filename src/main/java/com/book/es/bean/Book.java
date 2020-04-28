@@ -43,6 +43,8 @@ public class Book {
 
     private Date createdTime;
 
+    private String bookType;
+
     public Integer getId() {
         return id;
     }
@@ -139,6 +141,14 @@ public class Book {
         this.createdTime = createdTime;
     }
 
+    public String getBookType() {
+        return bookType;
+    }
+
+    public void setBookType(String bookType) {
+        this.bookType = bookType;
+    }
+
     @Override
     public String toString() {
         return "Book{" +
@@ -154,6 +164,7 @@ public class Book {
                 ", describe='" + describe + '\'' +
                 ", picture='" + picture + '\'' +
                 ", createdTime=" + createdTime +
+                ", bookType='" + bookType + '\'' +
                 '}';
     }
 }

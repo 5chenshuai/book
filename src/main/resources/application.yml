@@ -18,3 +18,5 @@ aliyun-oss:
   endpoint : https://oss-cn-beijing.aliyuncs.com
   accessKeyId: LTAI4FgAGCV4Mhx8wQsottuB
   accessKeySecret: FsDc7amlVJNsqbpzxBjgj3tAyrNWkx
+#server:
+#  port: 8072

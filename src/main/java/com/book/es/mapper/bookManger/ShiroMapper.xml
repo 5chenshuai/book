@@ -15,8 +15,15 @@
         INSERT into tbl_user(`username`,`password`,`name`,`email`) VALUES(#{userName},#{userName},#{name},#{email});
     </insert>
 
-    <update id="updatePassword" parameterType="com.book.es.bean.User">
-        update tbl_user set password = #{password} where id = #{id}
+    <update id="updateUser" parameterType="com.book.es.bean.User">
+        update tbl_user set id=#{id}
+        <if test="password!=null">
+            ,password = #{password}
+        </if>
+        <if test="email!=null">
+            ,email = #{email}
+        </if>
+        where id = #{id}
     </update>
 
     <select id="queryUser" resultType="com.book.es.bean.User">
@@ -38,11 +45,11 @@
         </collection>
     </resultMap>
 
-    <select id="queryRoleByUserName" resultType="com.book.es.bean.Role">
-        SELECT tbl_user_role.rid
-         from tbl_user,tbl_user_role
-         WHERE tbl_user.id=tbl_user_role.uid
-         and username = #{userName}
+    <select id="queryRoleByUid" resultType="java.lang.String">
+        SELECT tbl_role.role_name
+         from tbl_role,tbl_user_role
+         WHERE tbl_role.id=tbl_user_role.rid
+         and uid = #{uid}
     </select>
     <select id="queryPermissionsByUserName" resultType="com.book.es.bean.Permissions">
         SELECT tbl_permissions.id,tbl_permissions.permissions_name
@@ -52,6 +59,13 @@
     </select>
 
 
+    <select id="queryAllUser" parameterType="java.lang.String" resultType="com.book.es.vo.UserVO">
+        select tbl_user.id id,tbl_user.username userName,tbl_role.role_name role,tbl_user.name name,tbl_user.email email from tbl_user,tbl_user_role,tbl_role
+         where tbl_user.id=tbl_user_role.uid and tbl_user_role.rid=tbl_role.id
+        <if test="role!=null">
+            and tbl_role.role_name = #{role}
+        </if>
+    </select>
 
 
 </mapper>

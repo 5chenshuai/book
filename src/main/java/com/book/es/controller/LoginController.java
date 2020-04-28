@@ -5,8 +5,11 @@ import com.book.es.bean.Role;
 import com.book.es.bean.User;
 import com.book.es.logging.Logging;
 import com.book.es.service.LoginService;
+import com.book.es.vo.UserVO;
 import com.book.es.web.BaseController;
+import com.book.es.web.PageResult;
 import com.book.es.web.WebResponse;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -16,13 +19,14 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -35,18 +39,20 @@ public class LoginController extends Logging implements BaseController {
     private LoginService loginService;
 
 //    @ValidatorAnnotation
-    @RequestMapping("/login")
-    public WebResponse login(@Valid User user, BindingResult bindingResult) {
+    @PostMapping("/login")
+    public WebResponse login(@RequestBody @Valid User user, BindingResult bindingResult) {
         //添加用户认证信息
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(
                 user.getUserName(),
                 user.getPassword()
         );
+        UserVO userInfo;
         try {
             //进行验证，这里可以捕获异常，然后返回对应信息
             subject.login(usernamePasswordToken);
             infoWithLogger(loginLogger,"登陆成功uId:<{}>",user.getUserName());
+            userInfo = loginService.getUserInfo(user.getUserName());
 //            subject.checkRole("admin");
 //            subject.checkPermissions("query", "add");
         } catch (AuthenticationException e) {
@@ -54,46 +60,59 @@ public class LoginController extends Logging implements BaseController {
         } catch (AuthorizationException e) {
             return defaultErr().setMsg("没有权限");
         }
-        return ok();
-    }
-    //注解验角色和权限
-//    @RequiresRoles("admin")
-//    @RequiresPermissions("delete1")
-    @RequestMapping("/index")
-    public String index() {
-        return "index!";
+        return ok().setData(userInfo);
     }
 
 
-    @GetMapping("/book/guest/index1")
-    public String index1() {
-        return "index!";
+    @PostMapping("/user/update")
+    public WebResponse updatePassword(@RequestBody User user){
+        User user1 = (User) SecurityUtils.getSubject().getPrincipal();
+        user.setId(user1.getId());
+        if(loginService.updateUser(user)) {
+            return ok().setData(loginService.getUserInfo(user.getUserName()));
+        } else {
+            return defaultErr();
+        }
     }
 
-    @RequiresPermissions("delete1")
-    @PostMapping("/index2")
-    public String index2() {
-        return "index!";
-    }
-
-    @PostMapping("/update/password")
-    public WebResponse updatePassword(String password){
-        User user = (User) SecurityUtils.getSubject().getPrincipal();
-        loginService.updatePasswordById(password,user.getId());
-        return ok();
-    }
-
-    @PostMapping("/add")
-    public WebResponse addUser(User user){
+    @RequiresPermissions("user/add")
+    @PostMapping("/user/add")
+    public WebResponse addUser(@RequestBody User user){
         loginService.addUser(user);
         loginService.addUserRole(user.getId(),3);
         return ok();
     }
 
-
-    @PostMapping("/updaterole")
-    public WebResponse updateUserRole(Integer uid, Integer rid){
+    @RequiresPermissions("user/update")
+    @PostMapping("/user/updaterole")
+    public WebResponse updateUserRole(Integer uid,Integer rid){
         loginService.updateUserRoleById(uid,rid);
+        return ok();
+    }
+
+//    @RequiresPermissions("user/get")
+//    @GetMapping("/user/get")
+//    public WebResponse getUserInfo(String userName) {
+//        return ok().setData(loginService.getUserInfo(userName));
+//    }
+
+
+    @RequiresPermissions("user/get")
+    @GetMapping("/user/getAll")
+    public WebResponse getAllUserInfo(UserVO userVO,@PageableDefault(page = 0,size = 10) Pageable pageable) {
+        if(userVO.getUserName()!=null) {
+            UserVO userInfo = loginService.getUserInfo(userVO.getUserName());
+            List<UserVO> userVOS = new ArrayList<>();
+            userVOS.add(userInfo);
+            new PageResult(userVOS,1, (long) 1,0,10,true,true);
+            return ok().setData(userVOS);
+        } else {
+            return ok().setData(loginService.queryAllUser(userVO,pageable));
+        }
+    }
+
+    @GetMapping("/index")
+    public WebResponse index(){
         return ok();
     }
 }

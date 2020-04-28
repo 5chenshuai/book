@@ -17,7 +17,7 @@ public interface BookService {
 
     Page<Book> search(Book book, Pageable pageable);
 
-    boolean updateById(Book book, MultipartFile file) throws RuntimeException;
+    boolean updateById(Book book) throws RuntimeException;
 
     Book findByNumberForUpdate(String bookNumber);
 

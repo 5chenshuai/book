@@ -5,13 +5,16 @@ import com.book.es.bean.Role;
 import com.book.es.bean.User;
 import com.book.es.mapper.bookManger.ShiroMapper;
 import com.book.es.service.LoginService;
+import com.book.es.vo.UserVO;
+import com.book.es.web.PageResult;
+import com.book.es.web.WebResponse;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -26,9 +29,9 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public Boolean updatePasswordById(String password, Integer id) {
+    public Boolean updateUser(User user) {
 
-        shiroMapper.updatePassword(password, id);
+        shiroMapper.updateUser(user);
 
         return true;
     }
@@ -48,6 +51,30 @@ public class LoginServiceImpl implements LoginService {
     public boolean updateUserRoleById(Integer uid,Integer rid) {
         shiroMapper.updateUserRole(uid,rid);
         return true;
+    }
+
+    @Override
+    public PageResult<UserVO> queryAllUser(UserVO userVO,Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
+        com.github.pagehelper.Page<UserVO> users = PageHelper.startPage(pageNumber, pageSize);
+        List<UserVO> userVOS = shiroMapper.queryAllUser(userVO);
+        PageInfo<UserVO> borrowPageInfo = new PageInfo<>(users);
+        long totalElements = borrowPageInfo.getTotal();//总数据条数
+        int number = borrowPageInfo.getPageNum();//当前页
+        int size = borrowPageInfo.getPageSize();//当前页数据条数
+        int totalPages = borrowPageInfo.getPages();//总页数
+        boolean first = borrowPageInfo.isIsFirstPage();
+        boolean last = borrowPageInfo.isIsLastPage();
+        List<UserVO> content = borrowPageInfo.getList();//结果集8
+        return new PageResult(content,totalPages,totalElements,number,size,first,last);
+    }
+
+    @Override
+    public UserVO getUserInfo(String userName) {
+        User user = shiroMapper.queryUser(userName);
+        String role = shiroMapper.queryRoleByUid(user.getId());
+        return new UserVO(user.getId(),user.getUserName(),role,user.getName(),user.getEmail());
     }
 
 

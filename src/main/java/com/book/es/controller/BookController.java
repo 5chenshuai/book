@@ -48,7 +48,7 @@ public class BookController implements BaseController {
     @RequiresPermissions("book/add")
     @PostMapping("/add")
     @ValidatorAnnotation
-    public WebResponse add(@Valid Book book, BindingResult bindingResult, @RequestParam(value = "file",required = false) MultipartFile file) {
+    public WebResponse add(@RequestBody @Valid Book book, BindingResult bindingResult) {
         try {
 
             List<Book> books = bookMapper.selectBookByNumber(book.getBookNumber());
@@ -57,15 +57,11 @@ public class BookController implements BaseController {
                     book.setStatus(BookStatusEnum.BOOK_ABLE.getCode());
                     book.setId(books.get(0).getId());
                     book.setCreatedTime(new Date());
-                    updateById(book,file);
+                    updateById(book);
                     return ok().setData(book);
                 } else {
                     return defaultErr().setMsg("书本已存在");
                 }
-            }
-            if(file!=null) {
-                String url = aliyunOSSService.uploadImg(file);
-                book.setPicture(url);
             }
             Book add = bookService.add(book);
             return ok().setData(add);
@@ -73,6 +69,12 @@ public class BookController implements BaseController {
             System.out.println(e.getMessage());
             return defaultErr().setMsg(e.getMessage());
         }
+    }
+
+    @RequiresPermissions("book/add")
+    @PostMapping("/uploadImg")
+    public WebResponse uploadImg( @RequestParam(value = "file",required = false) MultipartFile file) {
+         return ok().setData(aliyunOSSService.uploadImg(file));
     }
 
 //    @RequiresPermissions("book/find")
@@ -111,12 +113,12 @@ public class BookController implements BaseController {
 
     @RequiresPermissions("book/update")
     @PostMapping("/update")
-    public WebResponse updateById(Book book,@RequestParam(value = "file",required = false) MultipartFile file) {
+    public WebResponse updateById(@RequestBody Book book) {
         if(book.getStatus()!= BookStatusEnum.BOOK_ABLE.getCode() && book.getStatus()!= BookStatusEnum.BOOK_UNABLE.getCode() && book.getStatus()!= BookStatusEnum.BOOK_DELETE.getCode()) {
             return defaultErr().setMsg("状态不正确");
         }
         try {
-            if(bookService.updateById(book,file)) {
+            if(bookService.updateById(book)) {
                 return ok();
             }
         } catch (Exception e) {

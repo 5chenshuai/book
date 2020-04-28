@@ -5,6 +5,7 @@ import java.util.Set;
 public class Menu {
    private Integer id;
    private String menuName;
+   private String url;
 
 
 
@@ -33,11 +34,20 @@ public class Menu {
         this.menuName = menuName;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "Menu{" +
                 "id=" + id +
                 ", menuName='" + menuName + '\'' +
+                ", url='" + url + '\'' +
                 '}';
     }
 }

@@ -3,11 +3,14 @@ package com.book.es;
 import com.book.es.bean.Book;
 import com.book.es.bean.BorrowUser;
 import com.book.es.mapper.bookManger.BorrowMapper;
+import com.book.es.mapper.bookManger.MenuMapper;
 import com.book.es.mapper.bookManger.ShiroMapper;
+import com.book.es.mapper.bookManger.SiteConfMapper;
 import com.book.es.mapper.mycat.BookMapper;
 import com.book.es.service.BookService;
 import com.book.es.service.BorrowService;
 import com.book.es.service.EmailService;
+import com.book.es.service.MenuService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +28,13 @@ class EsApplicationTests {
     @Autowired
     private BookService bookService;
 
+
+    @Autowired
+    private MenuMapper menuMapper;
+
+    @Autowired
+    private MenuService menuService;
+
     @Autowired
     private BookMapper bookMapper;
 
@@ -33,8 +43,10 @@ class EsApplicationTests {
 
     @Test
     void contextLoads() {
-        System.out.println(shiroMapper.queryUser("admin"));
-    }
+//        List<Integer> objects = new ArrayList<>();
+//        objects.add(14);
+//        System.out.println(menuMapper.selectMenu(objects));
+}
 
     @Autowired
     private BorrowService borrowService;
@@ -42,15 +54,15 @@ class EsApplicationTests {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private SiteConfMapper siteConfMapper;
+
     @Test
     void contextLoads1() {
 
-        List<BorrowUser> borrows = borrowService.queryShouldReturnBorrow();
-
-        for (BorrowUser borrowUser:borrows) {
-            emailService.sendEmail(borrowUser.getName(),borrowUser.getEmail(),borrowUser.getBookName(),borrowUser.getShouldReturnDay());
-        }
-//        Book book = new Book();
+//        String value = siteConfMapper.getConfByKey("maxBorrow");
+//        System.out.println(value);
+////        Book book = new Book();
 //        book.setId(20018);
 //        book.setStatus(0);
 //        try {

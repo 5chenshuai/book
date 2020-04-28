@@ -34,6 +34,6 @@ public class ReturnScheduled {
         for (BorrowUser borrowUser:borrows) {
             emailService.sendEmail(borrowUser.getName(),borrowUser.getEmail(),borrowUser.getBookName(),borrowUser.getShouldReturnDay());
         }
-
+        borrowService.updateBorrowOverdue();
     }
 }

@@ -80,12 +80,16 @@ public class BookServiceImpl implements BookService {
             MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("status", book.getStatus());
             boolQueryBuilder.must(matchQuery);
         }
+        if(!StringUtils.isEmpty(book.getBookType())) {
+            MatchQueryBuilder matchQuery = QueryBuilders.matchQuery("bookType", book.getBookType());
+            boolQueryBuilder.must(matchQuery);
+        }
         Page<Book> books = bookRepository.search(boolQueryBuilder, pageable);
         return books;
     }
 
     @Override
-    public boolean updateById(Book book, MultipartFile file) throws RuntimeException {
+    public boolean updateById(Book book) throws RuntimeException {
         Book bookDB = null;
         Optional<Book> books = findById(book.getId() + "");
         if(books.isPresent()) {
@@ -97,11 +101,6 @@ public class BookServiceImpl implements BookService {
             } else {
                 throw new RuntimeException("书本不存在");
             }
-        }
-
-        if(file!=null) {
-            String url = aliyunOSSService.uploadImg(file);
-            book.setPicture(url);
         }
         bookToBookDB(book,bookDB);
         if(bookMapper.updateById(bookDB)==1) {
@@ -145,6 +144,9 @@ public class BookServiceImpl implements BookService {
         }
         if(book.getPicture()!=null) {
             bookDB.setPicture(book.getPicture());
+        }
+        if(book.getBookType()!=null) {
+            bookDB.setBookType(book.getBookType());
         }
     }
 

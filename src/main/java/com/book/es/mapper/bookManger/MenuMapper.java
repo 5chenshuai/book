@@ -11,7 +11,10 @@ public interface MenuMapper {
 
 
     int addMenu(@Param("menu_name")String menuName, Integer pid);
-    List<Menu> selectMenu(List<Integer> pid);
+
+    List<Integer> selectPidByRole(Integer roleId);
+
+    List<Menu> selectMenu(@Param("pid") List<Integer> pid);
 
 
 }

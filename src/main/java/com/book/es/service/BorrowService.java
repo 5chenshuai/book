@@ -20,4 +20,7 @@ public interface BorrowService {
 
     List<BorrowUser> queryShouldReturnBorrow();
 
+    boolean updateBorrowOverdue();
+
+
 }

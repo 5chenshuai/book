@@ -63,7 +63,13 @@ public class AliyunOSSUtil {
                 objectMetadata.setContentLength(inputStream.available());
                 objectMetadata.setCacheControl("no-cache");
                 objectMetadata.setHeader("Pragma", "no-cache");
-                objectMetadata.setContentType(file.getContentType());
+                if (file.getContentType().equalsIgnoreCase(".jpeg") ||
+                        file.getContentType().equalsIgnoreCase(".jpg") ||
+                        file.getContentType().equalsIgnoreCase(".png")) {
+                    objectMetadata.setContentType("image/jpg");
+                } else {
+                    objectMetadata.setContentType(file.getContentType());
+                }
                 objectMetadata.setContentDisposition("inline;filename=" + fileName);
                 fileName = StringUtils.isNotBlank(storagePath) ? storagePath + "/" + fileName : fileName;
                 //上传文件

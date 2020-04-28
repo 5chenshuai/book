@@ -7,6 +7,7 @@ import com.book.es.bean.User;
 import com.book.es.enums.BookStatusEnum;
 import com.book.es.enums.BorrowStatusEnum;
 import com.book.es.mapper.bookManger.BorrowMapper;
+import com.book.es.mapper.bookManger.SiteConfMapper;
 import com.book.es.service.BookService;
 import com.book.es.service.BorrowService;
 import com.book.es.web.PageResult;
@@ -35,13 +36,19 @@ public class BorrowServiceImpl implements BorrowService {
     @Autowired
     private BookService bookService;
 
+    @Autowired
+    private SiteConfMapper siteConfMapper;
+
+    private static final String maxBorrow="maxBorrow";
+
     @Override
     public boolean addBorrow(Borrow borrow) throws Exception {
         ArrayList<Integer> status = new ArrayList<>();
         status.add(BorrowStatusEnum.BORROWING_CREATED.getCode());
         status.add(BorrowStatusEnum.BORROWING_ABLE.getCode());
         List<Borrow> borrows = borrowMapper.queryBorrow(borrow.getUserId(), null, null,status);
-        if(borrows==null || borrows.size()<=3) {
+        String value = siteConfMapper.getConfByKey(maxBorrow);
+        if(borrows==null || borrows.size()<Integer.valueOf(value)) {
             for(Borrow temp:borrows) {
                 if(temp.getBookNumber().equalsIgnoreCase(borrow.getBookNumber())) {
                     throw new Exception("已申请借阅此图书，请勿重复申请");
@@ -90,14 +97,15 @@ public class BorrowServiceImpl implements BorrowService {
             returnDay=new Date();
         }
         Borrow borrow = borrowMapper.queryBorrowForUpdate(id);
-        User user = (User) SecurityUtils.getSubject().getPrincipal();
-        if(!user.getId().equals(borrow.getUserId())) {
-            throw new RuntimeException("该用户不存在此图书");
-        }
+//        User user = (User) SecurityUtils.getSubject().getPrincipal();
+//        if(!user.getId().equals(borrow.getUserId())) {
+//            throw new RuntimeException("该用户不存在此图书");
+//        }
         if(borrow.getStatus()!=status) {
             Book book = bookService.findByNumberForUpdate(borrow.getBookNumber());
             if(status==BorrowStatusEnum.BORROWING_ABLE.getCode()) {//批准
-                if(borrow.getStatus()!=BorrowStatusEnum.BORROWING_CREATED.getCode()) {
+                if(borrow.getStatus()!=BorrowStatusEnum.BORROWING_CREATED.getCode()
+                    && borrow.getStatus()!=BorrowStatusEnum.BORROWING_WAIT.getCode()) {
                     throw new RuntimeException("状态不正确");
                 }
                 if(book.getStatus()==BookStatusEnum.BOOK_ABLE.getCode()) {
@@ -109,7 +117,8 @@ public class BorrowServiceImpl implements BorrowService {
                     throw new RuntimeException("该图书不可借");
                 }
             } else if(status==BorrowStatusEnum.BORROWING_RETURN.getCode()) {//归还
-                if(borrow.getStatus()!=BorrowStatusEnum.BORROWING_ABLE.getCode()) {
+                if(borrow.getStatus()!=BorrowStatusEnum.BORROWING_ABLE.getCode()
+                        && borrow.getStatus()!=BorrowStatusEnum.BORROWING_OVERDUE.getCode()) {
                     throw new RuntimeException("状态不正确");
                 }
                 if(book.getStatus()==BookStatusEnum.BOOK_UNABLE.getCode()) {
@@ -118,13 +127,14 @@ public class BorrowServiceImpl implements BorrowService {
                     borrowMapper.updateBorrowByBookNumber(borrow.getBookNumber(),BorrowStatusEnum.BORROWING_WAIT.getCode(),BorrowStatusEnum.BORROWING_CREATED.getCode());
                 }
             } else if(status==BorrowStatusEnum.BORROWING_UNABLE.getCode()||status==BorrowStatusEnum.BORROWING_CANCEL.getCode()) {//回绝，撤销
-                if(borrow.getStatus()!=BorrowStatusEnum.BORROWING_CREATED.getCode() && borrow.getStatus()!=BorrowStatusEnum.BORROWING_WAIT.getCode()) {
+                if(borrow.getStatus()!=BorrowStatusEnum.BORROWING_CREATED.getCode()
+                        && borrow.getStatus()!=BorrowStatusEnum.BORROWING_WAIT.getCode()) {
                     throw new RuntimeException("状态不正确");
                 }
             }
             int i = borrowMapper.updateBorrowById(id, examineDay, returnDay, status);
             if(needUpdateBook) {
-                bookService.updateById(book,null);
+                bookService.updateById(book);
             }
             return i>0;
         } else {
@@ -135,5 +145,11 @@ public class BorrowServiceImpl implements BorrowService {
     @Override
     public List<BorrowUser> queryShouldReturnBorrow() {
         return borrowMapper.queryShouldReturn(1);
+    }
+
+    @Override
+    public boolean updateBorrowOverdue() {
+        borrowMapper.updateBorrowOverdue(BorrowStatusEnum.BORROWING_OVERDUE.getCode());
+        return true;
     }
 }

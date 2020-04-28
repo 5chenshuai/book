@@ -5,13 +5,16 @@ import com.book.es.shiro.CustomRealm;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.filter.authc.LogoutFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.servlet.Filter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Configuration
@@ -45,12 +48,22 @@ public class ShiroConfig {
     public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
+
+        //退出
+        LogoutFilter logoutFilter = new LogoutFilter();
+        logoutFilter.setRedirectUrl("/index");
+        Map<String, Filter> filters = new HashMap<>();
+        filters.put("logout",logoutFilter);
+        shiroFilterFactoryBean.setFilters(filters);
+
+
         Map<String, String> map = new HashMap<>();
         //登出
         map.put("/logout", "logout");
         //对所有用户认证
         map.put("/**", "authc");
         map.put("/**/guest/**", "anon");
+        map.put("/index", "anon");
         //登录
         shiroFilterFactoryBean.setLoginUrl("/login");
         //首页

@@ -53,6 +53,16 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
 
     @Override
     public String uploadPdf(MultipartFile file) {
-        return null;
+        MultipartFile[] files = new MultipartFile[1];
+        files[0] = file;
+        if (file == null) {
+            throw new RuntimeException(ErrorCode.OPT_UPLOAD_FILE.getName());
+        }
+        try {
+            return aliyunOSSUtil.uploadFile(files, FileTypeEnum.PDF, aliyunOSSProperties.getBucketApp(), "pdf", aliyunOSSProperties.getDomainApp()).get(0);
+        } catch (Exception e) {
+//            logger.error("uploadImg error e:{}", e);
+            throw new RuntimeException(ErrorCode.UPLOAD_FAIL.getName());
+        }
     }
 }

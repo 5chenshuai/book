@@ -28,4 +28,6 @@ public interface BorrowMapper {
 
     List<BorrowUser> queryShouldReturn(Integer status);
 
+    int updateBorrowOverdue(int status);
+
 }
